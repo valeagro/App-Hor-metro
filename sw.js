@@ -5,7 +5,7 @@ const CACHE_NAME = 'horimetro-pro-v3'; // Mudamos para v3 para forçar atualiza�
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
-  './manifest.json'
+  './manifest.json',
   // Adicione seus ícones aqui APENAS se você tiver certeza que eles existem na pasta correta:
   './icon-192.png',
   './icon-512.png'
@@ -55,4 +55,5 @@ self.addEventListener('fetch', (e) => {
       .catch(() => caches.match(e.request))
   );
 });
+
 
