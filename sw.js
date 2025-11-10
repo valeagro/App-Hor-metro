@@ -1,46 +1,57 @@
-const CACHE_NAME = 'horimetro-pro-v2'; // Alterado para v2 para forçar a atualização
+const CACHE_NAME = 'horimetro-pro-v3'; // Mudamos para v3 para forçar atualização
+
+// Lista APENAS arquivos locais essenciais.
+// Removemos links externos (CDN) para evitar erros de CORS.
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
-  './manifest.json',
-  'https://cdn.tailwindcss.com',
-  'https://unpkg.com/lucide@latest'
+  './manifest.json'
+  // Adicione seus ícones aqui APENAS se você tiver certeza que eles existem na pasta correta:
+  './icons/icon-192.png',
+  './icons/icon-512.png'
 ];
 
-// Instalação do Service Worker e cache dos recursos estáticos
 self.addEventListener('install', (e) => {
+  console.log('[SW] Instalando...');
   e.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      // Pula a espera e ativa o novo SW imediatamente
-      self.skipWaiting();
-      return cache.addAll(ASSETS_TO_CACHE);
-    })
+      console.log('[SW] Cacheando arquivos essenciais');
+      // Usamos map + catch para que se UM arquivo falhar, não quebre tudo.
+      return Promise.all(
+        ASSETS_TO_CACHE.map(url => {
+          return cache.add(url).catch(err => {
+            console.warn('[SW] Falha ao cachear:', url, err);
+            return Promise.resolve(); // Continua mesmo com erro
+          });
+        })
+      );
+    }).then(() => self.skipWaiting())
   );
 });
 
-// Ativação e limpeza de caches antigos
 self.addEventListener('activate', (e) => {
+  console.log('[SW] Ativado');
   e.waitUntil(
     caches.keys().then((keyList) => {
       return Promise.all(keyList.map((key) => {
         if (key !== CACHE_NAME) {
-          console.log('Limpando cache antigo:', key);
+          console.log('[SW] Removendo cache antigo:', key);
           return caches.delete(key);
         }
       }));
-    }).then(() => self.clients.claim()) // Controla a página imediatamente
+    }).then(() => self.clients.claim())
   );
 });
 
-// Interceptação de requisições (Network First)
 self.addEventListener('fetch', (e) => {
-  // Não cacheia requisições do Firebase
-  if (e.request.url.includes('firestore.googleapis.com') || e.request.url.includes('firebase')) {
-      return;
-  }
-
+  // Estratégia: Tenta a rede primeiro, se falhar, usa o cache.
+  // Ideal para apps que precisam de dados atualizados (como o Firebase).
   e.respondWith(
     fetch(e.request)
+      .then(response => {
+        // Opcional: Poderíamos atualizar o cache aqui com a nova resposta bem-sucedida
+        return response;
+      })
       .catch(() => caches.match(e.request))
   );
 });
