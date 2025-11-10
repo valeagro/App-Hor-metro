@@ -7,8 +7,8 @@ const ASSETS_TO_CACHE = [
   './index.html',
   './manifest.json'
   // Adicione seus ícones aqui APENAS se você tiver certeza que eles existem na pasta correta:
-  './icons/icon-192.png',
-  './icons/icon-512.png'
+  './icon-192.png',
+  './icon-512.png'
 ];
 
 self.addEventListener('install', (e) => {
@@ -55,3 +55,4 @@ self.addEventListener('fetch', (e) => {
       .catch(() => caches.match(e.request))
   );
 });
+
