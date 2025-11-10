@@ -32,6 +32,22 @@
         </div>
     </div>
 
+    <div id="delete-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-40 items-center justify-center hidden px-4">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-sm">
+            <div class="flex items-center">
+                <div class="mr-3 flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
+                    <i data-lucide="alert-triangle" class="w-6 h-6 text-red-600"></i>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900">Confirmar Exclusão</h3>
+            </div>
+            <p class="text-sm text-gray-600 mt-4">Tem certeza que deseja excluir este registro? Esta ação não pode ser desfeita.</p>
+            <div class="mt-6 flex justify-end space-x-3">
+                <button id="modal-cancel-btn" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400">Cancelar</button>
+                <button id="modal-confirm-btn" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">Excluir</button>
+            </div>
+        </div>
+    </div>
+
     <div class="min-h-screen flex flex-col">
         <header class="bg-white shadow-sm z-10">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
@@ -51,6 +67,7 @@
         </header>
 
         <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
             <div class="lg:col-span-1 space-y-6">
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                     <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
@@ -73,12 +90,14 @@
                                     </select>
                                 </div>
                             </div>
+
                             <div>
                                 <label class="block text-xs font-medium text-gray-500 uppercase mb-1">Equipamento</label>
                                 <select id="equipment" required class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
                                     <option value="">Selecione o equipamento</option>
                                 </select>
                             </div>
+
                             <div class="pt-4 border-t border-gray-100">
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
@@ -91,6 +110,7 @@
                                     </div>
                                 </div>
                             </div>
+
                             <div>
                                 <label class="block text-xs font-medium text-gray-700 uppercase mb-1">Horímetro Final (Automático)</label>
                                 <div class="relative">
@@ -98,6 +118,7 @@
                                     <i data-lucide="lock" class="w-4 h-4 text-blue-400 absolute top-4 right-3"></i>
                                 </div>
                             </div>
+
                             <button type="submit" id="submit-btn" disabled class="w-full flex justify-center items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 text-white font-medium rounded-lg transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
                                 <i data-lucide="loader-2" class="w-5 h-5 mr-2 animate-spin"></i>
                                 Carregando...
@@ -108,6 +129,7 @@
             </div>
 
             <div class="lg:col-span-2 space-y-6">
+                
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
                         <h2 class="font-semibold text-gray-800 flex items-center">
@@ -119,6 +141,7 @@
                             Enviar Relatório (WhatsApp)
                         </button>
                     </div>
+                    
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
                         <div>
                             <label class="block text-xs text-gray-500 mb-1">Data Inicial</label>
@@ -142,6 +165,7 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col h-[500px]">
                     <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center sticky top-0">
                         <h2 class="font-semibold text-gray-800 flex items-center">
@@ -161,11 +185,12 @@
                                     <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Inicial</th>
                                     <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Operado</th>
                                     <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Final</th>
+                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Excluir</th>
                                 </tr>
                             </thead>
                             <tbody id="logs-body" class="bg-white divide-y divide-gray-100">
                                 <tr>
-                                    <td colspan="5" class="px-6 py-10 text-center text-gray-400 flex flex-col items-center justify-center">
+                                    <td colspan="6" class="px-6 py-10 text-center text-gray-400 flex flex-col items-center justify-center">
                                         <i data-lucide="inbox" class="w-10 h-10 mb-2 opacity-50"></i>
                                         <span>Aguardando dados...</span>
                                     </td>
@@ -179,9 +204,9 @@
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, collection, query, onSnapshot, limit, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        // Importações dinâmicas
+        let initializeApp, getAuth, signInAnonymously, onAuthStateChanged;
+        let getFirestore, doc, getDoc, setDoc, deleteDoc, collection, query, onSnapshot, limit, orderBy;
 
         // --- REGISTRO DO SERVICE WORKER (PWA) ---
         if ('serviceWorker' in navigator) {
@@ -212,8 +237,10 @@
         let dbInitialized = false;
         let allLogs = [];
         let filteredLogs = [];
+        let docToDelete = null;
         const els = {}; 
 
+        // --- FUNÇÕES AUXILIARES ---
         function parseTimeToMinutes(timeStr) {
             if (!timeStr) return 0;
             const str = String(timeStr).replace(',', '.').replace(/[^0-9.]/g, '');
@@ -262,20 +289,20 @@
                     els.submitBtn.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 mr-2 animate-spin"></i> Conectando...`;
                 } else {
                     els.statusIcon.className = 'w-3 h-3 mr-2 text-gray-400';
-                    els.statusText.textContent = 'Aguardando Configuração';
+                    els.statusText.textContent = 'Aguardando Config.';
                     els.submitBtn.innerHTML = `<i data-lucide="alert-circle" class="w-5 h-5 mr-2"></i> Verifique Config`;
                 }
             }
             if (window.lucide) window.lucide.createIcons();
         }
 
+        // --- LÓGICA DE NEGÓCIO ---
         function calculateEnd() {
             if (!els.startHour || !els.operatedHours) return;
             const start = parseTimeToMinutes(els.startHour.value);
             const op = parseTimeToMinutes(els.operatedHours.value);
             els.endHour.value = formatMinutesToTime(start + op);
         }
-
         async function autoFillStartHour() {
             if (!dbInitialized || !userId || !els.date?.value || !els.equipment?.value || !els.shift?.value) return;
             const d = new Date(els.date.value + 'T12:00:00Z');
@@ -297,19 +324,17 @@
                 calculateEnd();
             }
         }
-
         function applyFilters() {
             if (!els.fDateStart) return;
             const start = els.fDateStart.value, end = els.fDateEnd.value, eq = els.fEquip.value, sh = els.fShift.value;
             filteredLogs = allLogs.filter(log => (!start || log.date >= start) && (!end || log.date <= end) && (eq === 'all' || log.equipment === eq) && (sh === 'all' || log.shift === sh));
             renderTable();
         }
-
         function renderTable() {
             if (!els.logsBody) return;
             els.recordCount.textContent = `${filteredLogs.length} registros`;
             if (filteredLogs.length === 0) {
-                els.logsBody.innerHTML = `<tr><td colspan="5" class="px-6 py-10 text-center text-gray-500 flex flex-col items-center"><i data-lucide="inbox" class="w-8 h-8 mb-2 opacity-40"></i>Nenhum registro encontrado.</td></tr>`;
+                els.logsBody.innerHTML = `<tr><td colspan="6" class="px-6 py-10 text-center text-gray-500 flex flex-col items-center"><i data-lucide="inbox" class="w-8 h-8 mb-2 opacity-40"></i>Nenhum registro encontrado.</td></tr>`;
             } else {
                 els.logsBody.innerHTML = filteredLogs.map(log => `
                     <tr class="hover:bg-blue-50/50 transition-colors">
@@ -318,13 +343,37 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right font-mono">${displayTime(log.startMinutes)}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right font-mono">${displayTime(log.opMinutes)}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900 text-right font-mono">${displayTime(log.endMinutes)}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right">
+                            <button class="delete-btn p-2 rounded-full hover:bg-red-100 text-red-500 hover:text-red-700 transition-colors focus:outline-none" data-doc-id="${log.docId}" title="Excluir Registro">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </td>
                     </tr>`).join('');
             }
             if (window.lucide) window.lucide.createIcons();
         }
 
-        function init() {
-            const ids = ['entry-form', 'date', 'equipment', 'shift', 'start-hour', 'operated-hours', 'end-hour', 'logs-body', 'record-count', 'status-icon', 'status-text', 'submit-btn', 'toast', 'toastMsg', 'fDateStart', 'fDateEnd', 'fEquip', 'fShift'];
+        // --- FUNÇÕES DO MODAL ---
+        function openDeleteModal(docId) {
+            docToDelete = docId;
+            els.deleteModal.classList.remove('hidden');
+            els.deleteModal.classList.add('flex');
+            if (window.lucide) window.lucide.createIcons(); 
+        }
+        function closeDeleteModal() {
+            docToDelete = null;
+            els.deleteModal.classList.add('hidden');
+            els.deleteModal.classList.remove('flex');
+        }
+
+        // --- INICIALIZAÇÃO DA APLICAÇÃO ---
+        async function init() {
+            const ids = [
+                'entry-form', 'date', 'equipment', 'shift', 'start-hour', 'operated-hours',
+                'end-hour', 'logs-body', 'record-count', 'status-icon', 'status-text',
+                'submit-btn', 'toast', 'toastMsg', 'fDateStart', 'fDateEnd', 'fEquip', 'fShift',
+                'delete-modal', 'modal-cancel-btn', 'modal-confirm-btn'
+            ];
             ids.forEach(id => els[id.includes('-') ? id.replace(/-(\w)/g, (m, c) => c.toUpperCase()) : id] = document.getElementById(id));
 
             if (els.equipment && els.fEquip) EQUIPMENTS.forEach(eq => { els.equipment.add(new Option(eq, eq)); els.fEquip.add(new Option(eq, eq)); });
@@ -336,7 +385,7 @@
             [els.startHour, els.operatedHours].forEach(el => el?.addEventListener('input', calculateEnd));
             [els.date, els.equipment, els.shift].forEach(el => el?.addEventListener('change', autoFillStartHour));
             [els.fDateStart, els.fDateEnd, els.fEquip, els.fShift].forEach(el => el?.addEventListener('input', applyFilters));
-
+            
             els.entryForm?.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 if (!dbInitialized || !userId) return showToast('Sem conexão com banco de dados.', 'error');
@@ -353,15 +402,47 @@
                 finally { updateStatus(true); }
             });
 
-            initFirebaseConnection();
+            els.modalCancelBtn?.addEventListener('click', closeDeleteModal);
+            els.modalConfirmBtn?.addEventListener('click', async () => {
+                if (!docToDelete || !dbInitialized) return;
+                try {
+                    // Usa o ID composto para deletar o documento correto
+                    await deleteDoc(doc(db, 'horimeter_logs_v2', docToDelete));
+                    showToast('Registro excluído com sucesso!', 'success');
+                } catch (e) {
+                    console.error("Erro ao excluir:", e);
+                    showToast('Falha ao excluir o registro.', 'error');
+                } finally {
+                    closeDeleteModal();
+                }
+            });
+
+            els.logsBody?.addEventListener('click', (e) => {
+                const deleteBtn = e.target.closest('.delete-btn');
+                if (deleteBtn) {
+                    const docId = deleteBtn.dataset.docId;
+                    if (docId) openDeleteModal(docId);
+                }
+            });
+
+            try {
+                const appModule = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js");
+                initializeApp = appModule.initializeApp;
+                const authModule = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js");
+                getAuth = authModule.getAuth; signInAnonymously = authModule.signInAnonymously; onAuthStateChanged = authModule.onAuthStateChanged;
+                const firestoreModule = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
+                getFirestore = firestoreModule.getFirestore; doc = firestoreModule.doc; getDoc = firestoreModule.getDoc; setDoc = firestoreModule.setDoc; deleteDoc = firestoreModule.deleteDoc; collection = firestoreModule.collection; query = firestoreModule.query; onSnapshot = firestoreModule.onSnapshot; limit = firestoreModule.limit; orderBy = firestoreModule.orderBy;
+
+                initFirebaseConnection();
+            } catch (e) {
+                console.error("Erro fatal ao carregar módulos Firebase:", e);
+                updateStatus(false);
+            }
         }
 
         function initFirebaseConnection() {
-            try {
-                // Verifica se a configuração foi preenchida
-                if (FIREBASE_CONFIG.apiKey === "SUA_API_KEY_AQUI") {
-                    throw new Error("Configuração do Firebase pendente");
-                }
+             try {
+                if (FIREBASE_CONFIG.apiKey === "SUA_API_KEY_AQUI") throw new Error("Configuração do Firebase pendente");
 
                 app = initializeApp(FIREBASE_CONFIG);
                 auth = getAuth(app);
@@ -371,10 +452,16 @@
                 onAuthStateChanged(auth, user => {
                     userId = user ? user.uid : null;
                     updateStatus(!!user);
+                    
                     if (user) {
                         onSnapshot(query(collection(db, 'horimeter_logs_v2'), orderBy('createdAt', 'desc'), limit(200)), (snap) => {
                             allLogs = [];
-                            snap.forEach(doc => allLogs.push(doc.data()));
+                            snap.forEach(doc => {
+                                allLogs.push({ 
+                                    ...doc.data(), 
+                                    docId: doc.id 
+                                });
+                            });
                             allLogs.sort((a, b) => {
                                 if (b.date !== a.date) return b.date.localeCompare(a.date);
                                 if (b.shift !== a.shift) return b.shift.localeCompare(a.shift);
@@ -385,12 +472,11 @@
                     }
                 });
                 signInAnonymously(auth).catch(e => console.error("Auth failed:", e));
-
             } catch (e) {
                 console.warn("Firebase não inicializado:", e.message);
                 dbInitialized = false;
                 updateStatus(false);
-                if (els.logsBody) els.logsBody.innerHTML = `<tr><td colspan="5" class="px-6 py-10 text-center text-gray-400">Aguardando configuração do Firebase.<br>Edite o arquivo index.html.</td></tr>`;
+                if (els.logsBody) els.logsBody.innerHTML = `<tr><td colspan="6" class="px-6 py-10 text-center text-gray-400">Aguardando configuração do Firebase.<br>Edite o arquivo index.html.</td></tr>`;
             }
         }
 
