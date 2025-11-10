@@ -368,17 +368,54 @@
 
         // --- INICIALIZAÇÃO DA APLICAÇÃO ---
         async function init() {
-            const ids = [
-                'entry-form', 'date', 'equipment', 'shift', 'start-hour', 'operated-hours',
-                'end-hour', 'logs-body', 'record-count', 'status-icon', 'status-text',
-                'submit-btn', 'toast', 'toastMsg', 'fDateStart', 'fDateEnd', 'fEquip', 'fShift',
-                'delete-modal', 'modal-cancel-btn', 'modal-confirm-btn'
-            ];
-            ids.forEach(id => els[id.includes('-') ? id.replace(/-(\w)/g, (m, c) => c.toUpperCase()) : id] = document.getElementById(id));
+            console.log("Iniciando app...");
+            
+            // 1. Capturar elementos do DOM (Mapeamento Seguro)
+            els.entryForm = document.getElementById('entry-form');
+            els.date = document.getElementById('date');
+            els.equipment = document.getElementById('equipment');
+            els.shift = document.getElementById('shift');
+            els.startHour = document.getElementById('start-hour');
+            els.operatedHours = document.getElementById('operated-hours');
+            els.endHour = document.getElementById('end-hour');
+            els.logsBody = document.getElementById('logs-body');
+            els.recordCount = document.getElementById('record-count');
+            els.statusIcon = document.getElementById('status-icon');
+            els.statusText = document.getElementById('status-text');
+            els.submitBtn = document.getElementById('submit-btn');
+            els.toast = document.getElementById('toast');
+            els.toastMsg = document.getElementById('toast-message');
+            
+            // Filtros (Mapeamento Explícito para evitar erros)
+            els.fDateStart = document.getElementById('filter-date-start');
+            els.fDateEnd = document.getElementById('filter-date-end');
+            els.fEquip = document.getElementById('filter-equipment');
+            els.fShift = document.getElementById('filter-shift');
 
-            if (els.equipment && els.fEquip) EQUIPMENTS.forEach(eq => { els.equipment.add(new Option(eq, eq)); els.fEquip.add(new Option(eq, eq)); });
-            if (els.shift && els.fShift) SHIFTS.forEach(sh => { els.shift.add(new Option(sh, sh)); els.fShift.add(new Option(sh, sh)); });
+            // Modal
+            els.deleteModal = document.getElementById('delete-modal');
+            els.modalCancelBtn = document.getElementById('modal-cancel-btn');
+            els.modalConfirmBtn = document.getElementById('modal-confirm-btn');
 
+            // 2. Popular menus (AGORA VAI!)
+            // Verifica se os elementos existem antes de tentar popular
+            if (els.equipment && els.fEquip) {
+                console.log("Populando equipamentos...");
+                EQUIPMENTS.forEach(eq => {
+                    els.equipment.add(new Option(eq, eq));
+                    els.fEquip.add(new Option(eq, eq));
+                });
+            } else { console.error("Erro: Menus de equipamento não encontrados no HTML"); }
+
+            if (els.shift && els.fShift) {
+                console.log("Populando turnos...");
+                SHIFTS.forEach(sh => {
+                    els.shift.add(new Option(sh, sh));
+                    els.fShift.add(new Option(sh, sh));
+                });
+            } else { console.error("Erro: Menus de turno não encontrados no HTML"); }
+
+            // 3. Configurar UI inicial e Eventos
             if (els.date) els.date.value = new Date(new Date().getTime() - (new Date().getTimezoneOffset() * 60000)).toISOString().split('T')[0];
             if (window.lucide) window.lucide.createIcons();
 
@@ -406,7 +443,6 @@
             els.modalConfirmBtn?.addEventListener('click', async () => {
                 if (!docToDelete || !dbInitialized) return;
                 try {
-                    // Usa o ID composto para deletar o documento correto
                     await deleteDoc(doc(db, 'horimeter_logs_v2', docToDelete));
                     showToast('Registro excluído com sucesso!', 'success');
                 } catch (e) {
@@ -425,6 +461,7 @@
                 }
             });
 
+            // 4. Iniciar Firebase (ÚLTIMO PASSO)
             try {
                 const appModule = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js");
                 initializeApp = appModule.initializeApp;
