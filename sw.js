@@ -1,4 +1,4 @@
-const CACHE_NAME = 'horimetro-pro-v1';
+const CACHE_NAME = 'horimetro-pro-v2'; // Alterado para v2 para forçar a atualização
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -11,6 +11,8 @@ const ASSETS_TO_CACHE = [
 self.addEventListener('install', (e) => {
   e.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
+      // Pula a espera e ativa o novo SW imediatamente
+      self.skipWaiting();
       return cache.addAll(ASSETS_TO_CACHE);
     })
   );
@@ -22,18 +24,17 @@ self.addEventListener('activate', (e) => {
     caches.keys().then((keyList) => {
       return Promise.all(keyList.map((key) => {
         if (key !== CACHE_NAME) {
+          console.log('Limpando cache antigo:', key);
           return caches.delete(key);
         }
       }));
-    })
+    }).then(() => self.clients.claim()) // Controla a página imediatamente
   );
 });
 
-// Interceptação de requisições (Estratégia: Network First, fallback to Cache)
-// Isso garante que o usuário sempre tente pegar a versão mais recente dos dados,
-// mas se estiver offline, carrega a interface do cache.
+// Interceptação de requisições (Network First)
 self.addEventListener('fetch', (e) => {
-  // Não cacheia requisições do Firebase/Firestore para evitar dados obsoletos
+  // Não cacheia requisições do Firebase
   if (e.request.url.includes('firestore.googleapis.com') || e.request.url.includes('firebase')) {
       return;
   }
